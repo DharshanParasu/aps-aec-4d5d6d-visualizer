@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+
+# Environment files (IMPORTANT: Never commit credentials!)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
