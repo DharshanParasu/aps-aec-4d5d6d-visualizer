@@ -9,6 +9,7 @@ interface AuthContextType {
     login: () => void;
     logout: () => void;
     checkAuth: () => Promise<void>;
+    setManualToken: (token: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -18,6 +19,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [accessToken, setAccessToken] = useState<string | null>(null);
 
     const checkAuth = async () => {
+        // First check if we have a manual token stored
+        const storedToken = localStorage.getItem('manual_access_token');
+        if (storedToken) {
+            setAccessToken(storedToken);
+            setIsAuthenticated(true);
+            return;
+        }
+
         try {
             const response = await fetch(`${API_BASE_URL}/api/auth/token`, {
                 credentials: 'include'
@@ -48,11 +57,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const logout = async () => {
         try {
+            // Clear manual token if exists
+            localStorage.removeItem('manual_access_token');
             await fetch(`${API_BASE_URL}/api/auth/logout`);
             setIsAuthenticated(false);
             setAccessToken(null);
         } catch (error) {
             console.error('Logout error:', error);
+        }
+    };
+
+    const setManualToken = (token: string) => {
+        if (token && token.trim()) {
+            localStorage.setItem('manual_access_token', token.trim());
+            setAccessToken(token.trim());
+            setIsAuthenticated(true);
         }
     };
 
@@ -67,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, accessToken, login, logout, checkAuth }}>
+        <AuthContext.Provider value={{ isAuthenticated, accessToken, login, logout, checkAuth, setManualToken }}>
             {children}
         </AuthContext.Provider>
     );
@@ -80,3 +99,4 @@ export function useAuth() {
     }
     return context;
 }
+

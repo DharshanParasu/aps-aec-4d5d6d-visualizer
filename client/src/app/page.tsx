@@ -50,13 +50,61 @@ const VIEW_TABS: { id: ViewMode; label: string; icon: ReactNode }[] = [
 ];
 
 export default function Home() {
-  const { isAuthenticated, login, logout } = useAuth();
+  const { isAuthenticated, login, logout, setManualToken } = useAuth();
   const { viewMode, setViewMode, currentModel } = useApp();
   const [selectedDbIds, setSelectedDbIds] = useState<number[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showTokenInput, setShowTokenInput] = useState(false);
+  const [tokenValue, setTokenValue] = useState('');
+
+  const handleTokenSubmit = () => {
+    if (tokenValue.trim()) {
+      setManualToken(tokenValue.trim());
+      setShowTokenInput(false);
+      setTokenValue('');
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Token Input Modal */}
+      {showTokenInput && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl border border-gray-700">
+            <h3 className="text-lg font-semibold text-white mb-4">Enter Access Token</h3>
+            <p className="text-sm text-gray-400 mb-4">
+              Paste your Autodesk access token directly. You can get a token from the
+              <a href="https://aps.autodesk.com/en/docs/oauth/v2/tutorials/get-3-legged-token/"
+                target="_blank"
+                className="text-blue-400 hover:underline ml-1">
+                APS Developer Portal
+              </a>
+            </p>
+            <textarea
+              value={tokenValue}
+              onChange={(e) => setTokenValue(e.target.value)}
+              placeholder="eyJhbGciOiJSUzI1NiIs..."
+              className="w-full h-32 bg-gray-900 border border-gray-600 rounded-lg p-3 text-sm text-white font-mono placeholder-gray-500 focus:outline-none focus:border-blue-500"
+            />
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={() => { setShowTokenInput(false); setTokenValue(''); }}
+                className="flex-1 px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors text-gray-300 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleTokenSubmit}
+                disabled={!tokenValue.trim()}
+                className="flex-1 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors text-white text-sm font-medium"
+              >
+                Use Token
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="glass border-b border-gray-700/50 px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -94,15 +142,27 @@ export default function Home() {
               Sign Out
             </button>
           ) : (
-            <button
-              onClick={login}
-              className="btn-primary flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-medium"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-              </svg>
-              Sign in with Autodesk
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowTokenInput(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors text-gray-300 text-sm"
+                title="Enter access token manually"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                </svg>
+                Use Token
+              </button>
+              <button
+                onClick={login}
+                className="btn-primary flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-medium"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
+                Sign in with Autodesk
+              </button>
+            </div>
           )}
         </div>
       </header>
