@@ -2,7 +2,8 @@
 
 A full-stack web application for visualizing 4D (Schedule), 5D (Cost), and 6D (Sustainability) BIM data using Autodesk Platform Services (APS) and the AEC Data Model API.
 
-![Preview][Application](https://github.com/user-attachments/assets/b2472f8c-73ec-4e37-b05a-c855cd469aa4)!
+![Application](https://github.com/user-attachments/assets/55461fd2-d4fb-4519-96ef-210559b3a783)
+
 
 
 ## Features
